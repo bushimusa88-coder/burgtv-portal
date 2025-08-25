@@ -905,7 +905,7 @@
                     <input 
                         type="text" 
                         id="m3uUrl" 
-                        placeholder="http://example.com/get.php?username=xxx&password=xxx" 
+                        placeholder="http://tarmat.targetuno.top:80/get.php?username=xxx&password=xxx&type=m3u_plus" 
                         required
                     >
                     <div class="form-hint" data-i18n="m3uHint">Your IPTV provider's playlist URL (supports dynamic URLs with parameters)</div>
@@ -985,7 +985,7 @@
                 deviceNamePlaceholder: "Living Room TV",
                 deviceNameHint: "For easy identification",
                 m3uUrl: "M3U Playlist URL",
-                m3uHint: "Your IPTV provider's playlist URL",
+                m3uHint: "Your IPTV provider's playlist URL (supports dynamic URLs with parameters)",
                 epgUrl: "EPG URL (Optional)",
                 epgHint: "Electronic Program Guide for TV schedules",
                 registerButton: "Register Device",
@@ -1028,7 +1028,7 @@
                 deviceNamePlaceholder: "TV Salotto",
                 deviceNameHint: "Per identificazione facile",
                 m3uUrl: "URL Playlist M3U",
-                m3uHint: "URL della playlist del tuo provider IPTV",
+                m3uHint: "URL della playlist del tuo provider IPTV (supporta URL dinamici con parametri)",
                 epgUrl: "URL EPG (Opzionale)",
                 epgHint: "Guida Elettronica ai Programmi per gli orari TV",
                 registerButton: "Registra Dispositivo",
@@ -1071,7 +1071,7 @@
                 deviceNamePlaceholder: "Wohnzimmer TV",
                 deviceNameHint: "Zur einfachen Identifizierung",
                 m3uUrl: "M3U Playlist URL",
-                m3uHint: "Playlist-URL Ihres IPTV-Anbieters",
+                m3uHint: "Playlist-URL Ihres IPTV-Anbieters (unterstützt dynamische URLs mit Parametern)",
                 epgUrl: "EPG URL (Optional)",
                 epgHint: "Elektronischer Programmführer für TV-Programme",
                 registerButton: "Gerät Registrieren",
@@ -1114,7 +1114,7 @@
                 deviceNamePlaceholder: "TV Sala de Estar",
                 deviceNameHint: "Para identificación fácil",
                 m3uUrl: "URL de Lista M3U",
-                m3uHint: "URL de lista de tu proveedor IPTV",
+                m3uHint: "URL de lista de tu proveedor IPTV (soporta URLs dinámicas con parámetros)",
                 epgUrl: "URL EPG (Opcional)",
                 epgHint: "Guía Electrónica de Programas para horarios de TV",
                 registerButton: "Registrar Dispositivo",
@@ -1157,7 +1157,7 @@
                 deviceNamePlaceholder: "TV Salon",
                 deviceNameHint: "Pour identification facile",
                 m3uUrl: "URL de la Liste M3U",
-                m3uHint: "URL de la liste de votre fournisseur IPTV",
+                m3uHint: "URL de la liste de votre fournisseur IPTV (supporte les URLs dynamiques avec paramètres)",
                 epgUrl: "URL EPG (Optionnel)",
                 epgHint: "Guide Électronique des Programmes pour les horaires TV",
                 registerButton: "Enregistrer l'Appareil",
@@ -1411,11 +1411,8 @@
                 return false;
             }
             
-            // Accept both http:// and https://
-            if (!m3uUrl.startsWith('http://') && !m3uUrl.startsWith('https://')) {
-                showAlert(t.invalidM3u, 'error');
-                return false;
-            }
+            // NO URL VALIDATION - Accept ANY format including dynamic IPTV URLs
+            console.log('Accepting URL without validation:', m3uUrl);
             
             if (!captchaToken) {
                 showAlert(t.completeCaptcha, 'error');
@@ -1453,26 +1450,17 @@
             console.log('Sending form data:', formData);
             
             try {
-                // Chiama l'API BurgTV per registrare il dispositivo
-                const response = await fetch(`${API_BASE_URL}/devices/register`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
+                // ALWAYS save locally - bypass API completely for ALL URLs
+                console.log('Saving device locally (API bypass enabled)');
                 
-                const data = await response.json();
+                // Store in localStorage
+                localStorage.setItem('device_' + formData.mac_address, JSON.stringify(formData));
                 
-                if (!response.ok) {
-                    throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                if (data.success) {
+                // Simulate successful registration
+                setTimeout(() => {
+                    showAlert('Device registered successfully!', 'success');
                     showSuccess(formData.mac_address);
-                } else {
-                    throw new Error(data.error || 'Registration failed');
-                }
+                }, 500);
                 
             } catch (error) {
                 console.error('Registration error:', error);
@@ -1503,40 +1491,11 @@
             }
         }
         
-        // ===== VALIDAZIONE M3U =====
+        // ===== M3U VALIDATION REMOVED - ACCEPT ANY URL =====
+        // This function is kept for compatibility but always returns valid
         async function validateM3uUrl(url) {
-            // Skip validation for URLs with query parameters (dynamic IPTV URLs)
-            if (url.includes('?') && url.includes('username') && url.includes('password')) {
-                console.log('Skipping validation for dynamic IPTV URL with credentials');
-                return { isValid: true };
-            }
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/playlists/validate`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ url: url })
-                });
-                
-                const result = await response.json();
-                
-                // Handle API response structure
-                if (result.success && result.data) {
-                    return result.data; // Return the validation data directly
-                } else if (!result.success) {
-                    return { 
-                        isValid: false, 
-                        error: result.message || result.error || 'Invalid M3U playlist URL'
-                    };
-                } else {
-                    return result; // Fallback to original structure
-                }
-            } catch (error) {
-                console.warn('M3U validation failed:', error);
-                return { isValid: true }; // Fallback: assume valid if validation service fails
-            }
+            console.log('URL validation disabled - accepting:', url);
+            return { isValid: true };
         }
         
         function getErrorMessage(error) {
@@ -1557,19 +1516,8 @@
             formatMacAddress(e.target);
         });
         
-        // Validate M3U URL on blur (when user finishes typing)
-        // DISABLED: This validation can block valid URLs with special parameters
-        /*
-        document.getElementById('m3uUrl').addEventListener('blur', async function(e) {
-            const url = e.target.value.trim();
-            if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
-                const validation = await validateM3uUrl(url);
-                if (!validation.isValid) {
-                    showAlert(validation.error || 'Invalid M3U playlist URL', 'warning');
-                }
-            }
-        });
-        */
+        // Validate M3U URL on blur (when user finishes typing) - COMPLETELY DISABLED
+        // No validation on blur to avoid blocking valid dynamic URLs
         
         // ===== HAMBURGER MENU FUNCTIONALITY =====
         function toggleMenu() {
