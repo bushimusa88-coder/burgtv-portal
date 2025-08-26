@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BurgTV Portal - Registrazione Dispositivo</title>
+    <meta name="description" content="Registra il tuo dispositivo per accedere ai servizi premium BurgTV IPTV">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         * {
             margin: 0;
@@ -11,97 +16,354 @@
             box-sizing: border-box;
         }
         
+        :root {
+            --bg: #0a0a0b;
+            --bg-secondary: #111113;
+            --text: #ffffff;
+            --text-secondary: #a0a0a8;
+            --accent: #B94A8E;
+            --accent-light: #d85aa3;
+            --accent-dark: #7B4397;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border: rgba(255,255,255,0.08);
+            --card-bg: rgba(255,255,255,0.03);
+            --card-hover: rgba(255,255,255,0.05);
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
-            color: #fff;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg-secondary) 100%);
+            color: var(--text);
             min-height: 100vh;
+            background-attachment: fixed;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            position: relative;
         }
-        
-        .container {
-            background: rgba(255,255,255,0.05);
+
+        /* Language Switcher */
+        .language-switcher {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 1000;
+            background: var(--card-bg);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 3rem;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
         
-        h1 {
-            text-align: center;
-            margin-bottom: 2rem;
-            background: linear-gradient(135deg, #b94a8e, #882785);
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .lang-btn:hover {
+            background: var(--card-hover);
+            color: var(--text);
+        }
+        
+        .lang-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        /* Hamburger Menu */
+        .menu-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            z-index: 1001;
+            border-radius: 8px;
+        }
+        
+        .menu-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: var(--text);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px,5px);
+        }
+        
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px,-6px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 300px;
+            height: 100vh;
+            background: rgba(15,15,25,0.98);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            transition: left 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .sidebar-header h2 {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: 2.5rem;
+            font-size: 1.8rem;
         }
         
-        .subtitle {
-            text-align: center;
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
+        .sidebar-nav {
+            padding: 20px 0;
         }
         
-        .form-group {
-            margin-bottom: 1.5rem;
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
         }
         
-        label {
+        .sidebar-nav a:hover {
+            background: var(--card-hover);
+            border-left-color: var(--accent);
+        }
+        
+        .sidebar-nav a.active {
+            background: rgba(185, 74, 142, 0.1);
+            border-left-color: var(--accent);
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            z-index: 98;
+        }
+        
+        .overlay.active {
             display: block;
-            margin-bottom: 0.5rem;
-            color: rgba(255,255,255,0.9);
+        }
+
+        /* Container */
+        .container {
+            max-width: 580px;
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.8rem;
+        }
+        
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Success Banner */
+        .success-banner {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #2ecc71;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.6rem;
             font-weight: 500;
+            color: var(--text);
+        }
+        
+        .form-label span {
+            color: var(--error);
         }
         
         input, select {
             width: 100%;
-            padding: 0.8rem;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            color: #fff;
+            padding: 0.95rem 1.2rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
             font-size: 1rem;
             transition: all 0.3s ease;
+            font-family: inherit;
         }
         
         input:focus, select:focus {
             outline: none;
-            border-color: #b94a8e;
-            background: rgba(255,255,255,0.12);
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.08);
             box-shadow: 0 0 0 3px rgba(185, 74, 142, 0.1);
         }
         
         input::placeholder {
-            color: rgba(255,255,255,0.5);
+            color: var(--text-secondary);
+            opacity: 0.7;
         }
         
-        .hint {
+        .form-hint {
             font-size: 0.85rem;
-            color: rgba(255,255,255,0.6);
-            margin-top: 0.3rem;
+            color: var(--text-secondary);
+            margin-top: 0.4rem;
+        }
+
+        /* Device Select with Icons */
+        .device-select-wrapper {
+            position: relative;
         }
         
+        .device-select {
+            appearance: none;
+            padding-left: 3rem;
+            cursor: pointer;
+        }
+        
+        .device-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            pointer-events: none;
+        }
+        
+        .device-select-arrow {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--text-secondary);
+        }
+
+        /* Terms Checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-top: 0.2rem;
+            accent-color: var(--accent);
+        }
+        
+        .checkbox-group label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+        
+        .checkbox-group label a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .checkbox-group label a:hover {
+            text-decoration: underline;
+        }
+
+        /* Button */
         .btn {
             width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #b94a8e 0%, #882785 100%);
+            padding: 1.1rem 2rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
+            border-radius: 12px;
+            font-size: 1.05rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 1rem;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
         
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 30px rgba(185, 74, 142, 0.4);
         }
@@ -109,26 +371,6 @@
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-        }
-        
-        .success-message, .error-message {
-            padding: 1rem;
-            border-radius: 10px;
-            margin-top: 1rem;
-            text-align: center;
-            display: none;
-        }
-        
-        .success-message {
-            background: rgba(46, 204, 113, 0.2);
-            border: 1px solid rgba(46, 204, 113, 0.5);
-            color: #2ecc71;
-        }
-        
-        .error-message {
-            background: rgba(231, 76, 60, 0.2);
-            border: 1px solid rgba(231, 76, 60, 0.5);
-            color: #e74c3c;
         }
         
         .loading {
@@ -139,110 +381,408 @@
             border-top-color: white;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin-left: 10px;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
         
-        .no-validation-notice {
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .alert.success {
             background: rgba(46, 204, 113, 0.1);
             border: 1px solid rgba(46, 204, 113, 0.3);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
-            text-align: center;
             color: #2ecc71;
         }
         
-        .no-validation-notice strong {
-            display: block;
-            margin-bottom: 0.3rem;
+        .alert.error {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .language-switcher {
+                top: auto;
+                bottom: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>BurgTV Portal</h1>
-        <p class="subtitle">Registra il tuo dispositivo per accedere a BurgTV</p>
-        
-        <div class="no-validation-notice">
-            <strong>✅ Modalità Universale Attiva</strong>
-            <small>Accetta TUTTE le liste IPTV senza restrizioni</small>
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <button class="lang-btn active" data-lang="it">🇮🇹 IT</button>
+        <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+        <button class="lang-btn" data-lang="de">🇩🇪 DE</button>
+        <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
+        <button class="lang-btn" data-lang="fr">🇫🇷 FR</button>
+    </div>
+
+    <!-- Menu Toggle -->
+    <button class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>BurgTV</h2>
         </div>
-        
+        <div class="sidebar-nav">
+            <a href="#" class="active">
+                <span>🏠</span>
+                <span data-translate="menu.home">Home</span>
+            </a>
+            <a href="#">
+                <span>📺</span>
+                <span data-translate="menu.devices">Dispositivi</span>
+            </a>
+            <a href="#">
+                <span>📋</span>
+                <span data-translate="menu.playlist">Playlist</span>
+            </a>
+            <a href="#">
+                <span>💎</span>
+                <span data-translate="menu.premium">Premium</span>
+            </a>
+            <a href="#">
+                <span>❓</span>
+                <span data-translate="menu.support">Supporto</span>
+            </a>
+            <a href="#">
+                <span>📖</span>
+                <span data-translate="menu.docs">Documentazione</span>
+            </a>
+            <a href="#">
+                <span>⚙️</span>
+                <span data-translate="menu.settings">Impostazioni</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="header">
+            <h1>BurgTV Portal</h1>
+            <p data-translate="subtitle">Registra il tuo dispositivo per accedere a BurgTV</p>
+        </div>
+
+        <div class="success-banner">
+            <strong>✅ Modalità Universale Attiva</strong><br>
+            <small data-translate="universal_mode">Accetta TUTTE le liste IPTV senza restrizioni</small>
+        </div>
+
         <form id="deviceForm">
             <div class="form-group">
-                <label for="deviceType">Tipo Dispositivo</label>
-                <select id="deviceType" required>
-                    <option value="">Seleziona dispositivo...</option>
-                    <option value="firetv">Amazon Fire TV</option>
-                    <option value="androidtv">Android TV</option>
-                    <option value="samsung">Samsung TV</option>
-                    <option value="lg">LG TV</option>
-                    <option value="appletv">Apple TV</option>
-                    <option value="other">Altro</option>
-                </select>
+                <label class="form-label" for="deviceType">
+                    <span data-translate="device_type">Tipo Dispositivo</span> <span>*</span>
+                </label>
+                <div class="device-select-wrapper">
+                    <span class="device-icon" id="deviceIcon">📺</span>
+                    <select id="deviceType" class="device-select" required>
+                        <option value="">Seleziona dispositivo...</option>
+                        <option value="firetv" data-icon="🔥">Amazon Fire TV</option>
+                        <option value="androidtv" data-icon="📺">Android TV</option>
+                        <option value="samsung" data-icon="📱">Samsung TV</option>
+                        <option value="lg" data-icon="📺">LG TV</option>
+                        <option value="appletv" data-icon="🍎">Apple TV</option>
+                        <option value="mag" data-icon="📡">MAG Box</option>
+                        <option value="enigma2" data-icon="📡">Enigma2</option>
+                        <option value="pc" data-icon="💻">PC/Mac</option>
+                        <option value="smartphone" data-icon="📱">Smartphone</option>
+                        <option value="other" data-icon="📺">Altro</option>
+                    </select>
+                    <span class="device-select-arrow">▼</span>
+                </div>
             </div>
-            
+
             <div class="form-group">
-                <label for="macAddress">MAC Address</label>
+                <label class="form-label" for="macAddress">
+                    MAC Address <span>*</span>
+                </label>
                 <input type="text" 
                        id="macAddress" 
                        placeholder="00:1A:2B:3C:4D:5E" 
                        maxlength="17"
                        pattern="^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
                        required>
-                <div class="hint">Formato: XX:XX:XX:XX:XX:XX</div>
+                <div class="form-hint" data-translate="mac_format">Formato: XX:XX:XX:XX:XX:XX</div>
             </div>
-            
+
             <div class="form-group">
-                <label for="deviceName">Nome Dispositivo (opzionale)</label>
+                <label class="form-label" for="deviceName">
+                    <span data-translate="device_name">Nome Dispositivo</span> <span data-translate="optional">(opzionale)</span>
+                </label>
                 <input type="text" 
                        id="deviceName" 
                        placeholder="TV Salotto">
             </div>
-            
+
             <div class="form-group">
-                <label for="m3uUrl">URL Lista M3U/IPTV</label>
+                <label class="form-label" for="m3uUrl">
+                    <span data-translate="m3u_url">URL Lista M3U/IPTV</span> <span>*</span>
+                </label>
                 <input type="text" 
                        id="m3uUrl" 
                        placeholder="http://provider.com/get.php?username=xxx&password=xxx" 
                        required>
-                <div class="hint">Accetta qualsiasi URL: .m3u, .m3u8, get.php con parametri, ecc.</div>
+                <div class="form-hint" data-translate="m3u_hint">Accetta qualsiasi URL: .m3u, .m3u8, get.php con parametri, ecc.</div>
             </div>
-            
+
             <div class="form-group">
-                <label for="epgUrl">URL EPG (opzionale)</label>
+                <label class="form-label" for="epgUrl">
+                    <span data-translate="epg_url">URL EPG</span> <span data-translate="optional">(opzionale)</span>
+                </label>
                 <input type="text" 
                        id="epgUrl" 
                        placeholder="http://provider.com/epg.xml">
-                <div class="hint">Guida TV XML (se disponibile)</div>
+                <div class="form-hint" data-translate="epg_hint">Guida TV XML (se disponibile)</div>
             </div>
-            
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms" required>
+                <label for="terms">
+                    <span data-translate="accept_terms">Accetto i</span>
+                    <a href="#" data-translate="terms_link">Termini e Condizioni</a>
+                    <span data-translate="and">e la</span>
+                    <a href="#" data-translate="privacy_link">Privacy Policy</a>
+                </label>
+            </div>
+
             <button type="submit" class="btn" id="submitBtn">
-                Registra Dispositivo
+                <span data-translate="register_button">Registra Dispositivo</span>
             </button>
         </form>
-        
-        <div class="success-message" id="successMessage">
-            ✅ Dispositivo registrato con successo!<br>
-            Puoi ora utilizzare BurgTV sul tuo dispositivo.
+
+        <div class="alert success" id="successAlert">
+            ✅ <span data-translate="success_message">Dispositivo registrato con successo!</span>
         </div>
-        
-        <div class="error-message" id="errorMessage">
-            ❌ Errore durante la registrazione. Riprova.
+
+        <div class="alert error" id="errorAlert">
+            ❌ <span data-translate="error_message">Errore durante la registrazione</span>
         </div>
     </div>
-    
+
     <script>
-        // Configurazione
-        const API_BASE_URL = 'https://burgtv-api.vercel.app/api'; // Sostituisci con il tuo API URL
-        
-        // Format MAC Address
-        function formatMacAddress(input) {
-            let value = input.value.replace(/[^0-9A-Fa-f]/g, '');
+        // Translations
+        const translations = {
+            it: {
+                'menu.home': 'Home',
+                'menu.devices': 'Dispositivi',
+                'menu.playlist': 'Playlist',
+                'menu.premium': 'Premium',
+                'menu.support': 'Supporto',
+                'menu.docs': 'Documentazione',
+                'menu.settings': 'Impostazioni',
+                'subtitle': 'Registra il tuo dispositivo per accedere a BurgTV',
+                'universal_mode': 'Accetta TUTTE le liste IPTV senza restrizioni',
+                'device_type': 'Tipo Dispositivo',
+                'device_name': 'Nome Dispositivo',
+                'optional': '(opzionale)',
+                'm3u_url': 'URL Lista M3U/IPTV',
+                'm3u_hint': 'Accetta qualsiasi URL: .m3u, .m3u8, get.php con parametri, ecc.',
+                'epg_url': 'URL EPG',
+                'epg_hint': 'Guida TV XML (se disponibile)',
+                'mac_format': 'Formato: XX:XX:XX:XX:XX:XX',
+                'accept_terms': 'Accetto i',
+                'terms_link': 'Termini e Condizioni',
+                'and': 'e la',
+                'privacy_link': 'Privacy Policy',
+                'register_button': 'Registra Dispositivo',
+                'success_message': 'Dispositivo registrato con successo!',
+                'error_message': 'Errore durante la registrazione'
+            },
+            en: {
+                'menu.home': 'Home',
+                'menu.devices': 'Devices',
+                'menu.playlist': 'Playlist',
+                'menu.premium': 'Premium',
+                'menu.support': 'Support',
+                'menu.docs': 'Documentation',
+                'menu.settings': 'Settings',
+                'subtitle': 'Register your device to access BurgTV',
+                'universal_mode': 'Accepts ALL IPTV lists without restrictions',
+                'device_type': 'Device Type',
+                'device_name': 'Device Name',
+                'optional': '(optional)',
+                'm3u_url': 'M3U/IPTV List URL',
+                'm3u_hint': 'Accepts any URL: .m3u, .m3u8, get.php with parameters, etc.',
+                'epg_url': 'EPG URL',
+                'epg_hint': 'TV Guide XML (if available)',
+                'mac_format': 'Format: XX:XX:XX:XX:XX:XX',
+                'accept_terms': 'I accept the',
+                'terms_link': 'Terms and Conditions',
+                'and': 'and',
+                'privacy_link': 'Privacy Policy',
+                'register_button': 'Register Device',
+                'success_message': 'Device registered successfully!',
+                'error_message': 'Registration error'
+            },
+            de: {
+                'menu.home': 'Startseite',
+                'menu.devices': 'Geräte',
+                'menu.playlist': 'Wiedergabeliste',
+                'menu.premium': 'Premium',
+                'menu.support': 'Unterstützung',
+                'menu.docs': 'Dokumentation',
+                'menu.settings': 'Einstellungen',
+                'subtitle': 'Registrieren Sie Ihr Gerät für BurgTV-Zugang',
+                'universal_mode': 'Akzeptiert ALLE IPTV-Listen ohne Einschränkungen',
+                'device_type': 'Gerätetyp',
+                'device_name': 'Gerätename',
+                'optional': '(optional)',
+                'm3u_url': 'M3U/IPTV Listen-URL',
+                'm3u_hint': 'Akzeptiert jede URL: .m3u, .m3u8, get.php mit Parametern, usw.',
+                'epg_url': 'EPG URL',
+                'epg_hint': 'TV-Programm XML (falls verfügbar)',
+                'mac_format': 'Format: XX:XX:XX:XX:XX:XX',
+                'accept_terms': 'Ich akzeptiere die',
+                'terms_link': 'Nutzungsbedingungen',
+                'and': 'und die',
+                'privacy_link': 'Datenschutzerklärung',
+                'register_button': 'Gerät registrieren',
+                'success_message': 'Gerät erfolgreich registriert!',
+                'error_message': 'Registrierungsfehler'
+            },
+            es: {
+                'menu.home': 'Inicio',
+                'menu.devices': 'Dispositivos',
+                'menu.playlist': 'Lista de reproducción',
+                'menu.premium': 'Premium',
+                'menu.support': 'Soporte',
+                'menu.docs': 'Documentación',
+                'menu.settings': 'Configuración',
+                'subtitle': 'Registra tu dispositivo para acceder a BurgTV',
+                'universal_mode': 'Acepta TODAS las listas IPTV sin restricciones',
+                'device_type': 'Tipo de Dispositivo',
+                'device_name': 'Nombre del Dispositivo',
+                'optional': '(opcional)',
+                'm3u_url': 'URL de Lista M3U/IPTV',
+                'm3u_hint': 'Acepta cualquier URL: .m3u, .m3u8, get.php con parámetros, etc.',
+                'epg_url': 'URL EPG',
+                'epg_hint': 'Guía TV XML (si está disponible)',
+                'mac_format': 'Formato: XX:XX:XX:XX:XX:XX',
+                'accept_terms': 'Acepto los',
+                'terms_link': 'Términos y Condiciones',
+                'and': 'y la',
+                'privacy_link': 'Política de Privacidad',
+                'register_button': 'Registrar Dispositivo',
+                'success_message': '¡Dispositivo registrado con éxito!',
+                'error_message': 'Error de registro'
+            },
+            fr: {
+                'menu.home': 'Accueil',
+                'menu.devices': 'Appareils',
+                'menu.playlist': 'Playlist',
+                'menu.premium': 'Premium',
+                'menu.support': 'Support',
+                'menu.docs': 'Documentation',
+                'menu.settings': 'Paramètres',
+                'subtitle': 'Enregistrez votre appareil pour accéder à BurgTV',
+                'universal_mode': 'Accepte TOUTES les listes IPTV sans restrictions',
+                'device_type': 'Type d\'appareil',
+                'device_name': 'Nom de l\'appareil',
+                'optional': '(optionnel)',
+                'm3u_url': 'URL de la liste M3U/IPTV',
+                'm3u_hint': 'Accepte toute URL: .m3u, .m3u8, get.php avec paramètres, etc.',
+                'epg_url': 'URL EPG',
+                'epg_hint': 'Guide TV XML (si disponible)',
+                'mac_format': 'Format: XX:XX:XX:XX:XX:XX',
+                'accept_terms': 'J\'accepte les',
+                'terms_link': 'Termes et Conditions',
+                'and': 'et la',
+                'privacy_link': 'Politique de Confidentialité',
+                'register_button': 'Enregistrer l\'appareil',
+                'success_message': 'Appareil enregistré avec succès!',
+                'error_message': 'Erreur d\'enregistrement'
+            }
+        };
+
+        let currentLang = 'it';
+
+        // Language switcher
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentLang = this.dataset.lang;
+                updateTranslations();
+            });
+        });
+
+        function updateTranslations() {
+            document.querySelectorAll('[data-translate]').forEach(elem => {
+                const key = elem.dataset.translate;
+                if (translations[currentLang][key]) {
+                    elem.textContent = translations[currentLang][key];
+                }
+            });
+        }
+
+        // Menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        menuToggle.addEventListener('click', function() {
+            menuToggle.classList.toggle('active');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', function() {
+            menuToggle.classList.remove('active');
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Device icon update
+        document.getElementById('deviceType').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const icon = selectedOption.dataset.icon || '📺';
+            document.getElementById('deviceIcon').textContent = icon;
+        });
+
+        // MAC address formatting
+        document.getElementById('macAddress').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9A-Fa-f]/g, '');
             let formatted = '';
             
             for (let i = 0; i < value.length && i < 12; i += 2) {
@@ -250,25 +790,20 @@
                 formatted += value.substring(i, Math.min(i + 2, value.length));
             }
             
-            input.value = formatted.toUpperCase();
-        }
-        
-        // MAC address formatting
-        document.getElementById('macAddress').addEventListener('input', function(e) {
-            formatMacAddress(e.target);
+            e.target.value = formatted.toUpperCase();
         });
-        
+
         // Form submission
         document.getElementById('deviceForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const submitBtn = document.getElementById('submitBtn');
-            const successMsg = document.getElementById('successMessage');
-            const errorMsg = document.getElementById('errorMessage');
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
             
-            // Reset messages
-            successMsg.style.display = 'none';
-            errorMsg.style.display = 'none';
+            // Hide alerts
+            successAlert.classList.remove('show');
+            errorAlert.classList.remove('show');
             
             // Get form data
             const formData = {
@@ -276,83 +811,53 @@
                 mac_address: document.getElementById('macAddress').value.toUpperCase(),
                 device_name: document.getElementById('deviceName').value.trim() || null,
                 m3u_url: document.getElementById('m3uUrl').value.trim(),
-                epg_url: document.getElementById('epgUrl').value.trim() || null
+                epg_url: document.getElementById('epgUrl').value.trim() || null,
+                terms_accepted: document.getElementById('terms').checked
             };
             
-            // Validazione minima lato client
+            // Basic validation
             const m3uUrl = formData.m3u_url;
             if (!m3uUrl.startsWith('http://') && !m3uUrl.startsWith('https://')) {
-                errorMsg.textContent = '❌ L\'URL deve iniziare con http:// o https://';
-                errorMsg.style.display = 'block';
+                errorAlert.classList.add('show');
+                errorAlert.querySelector('span').textContent = 'L\'URL deve iniziare con http:// o https://';
                 return;
             }
             
             // Show loading
             submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Registrazione in corso<span class="loading"></span>';
+            submitBtn.innerHTML = '<span class="loading"></span> Registrazione...';
             
             try {
-                // NESSUNA VALIDAZIONE - INVIA DIRETTAMENTE
-                console.log('Invio dati senza validazione:', formData);
+                // Simulate API call - NO VALIDATION
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 
-                // Se hai un'API backend, invia qui
-                const response = await fetch(`${API_BASE_URL}/devices/register`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
+                // Save to localStorage
+                const devices = JSON.parse(localStorage.getItem('burgtvDevices') || '[]');
+                devices.push({
+                    ...formData,
+                    registered_at: new Date().toISOString()
                 });
+                localStorage.setItem('burgtvDevices', JSON.stringify(devices));
                 
-                const data = await response.json();
+                // Show success
+                successAlert.classList.add('show');
+                document.getElementById('deviceForm').reset();
+                document.getElementById('deviceIcon').textContent = '📺';
                 
-                if (response.ok || data.success) {
-                    // Success
-                    successMsg.style.display = 'block';
-                    document.getElementById('deviceForm').reset();
-                    
-                    // Salva in localStorage per backup
-                    const devices = JSON.parse(localStorage.getItem('burgtvDevices') || '[]');
-                    devices.push({
-                        ...formData,
-                        registered_at: new Date().toISOString()
-                    });
-                    localStorage.setItem('burgtvDevices', JSON.stringify(devices));
-                    
-                } else {
-                    throw new Error(data.message || 'Errore di registrazione');
-                }
+                console.log('Device registered:', formData);
                 
             } catch (error) {
-                console.error('Errore:', error);
-                
-                // Se l'API fallisce, salva comunque localmente
-                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                    // Salva solo in localStorage
-                    const devices = JSON.parse(localStorage.getItem('burgtvDevices') || '[]');
-                    devices.push({
-                        ...formData,
-                        registered_at: new Date().toISOString(),
-                        offline_registration: true
-                    });
-                    localStorage.setItem('burgtvDevices', JSON.stringify(devices));
-                    
-                    successMsg.innerHTML = '✅ Dispositivo salvato localmente!<br><small>Verrà sincronizzato quando l\'API sarà disponibile</small>';
-                    successMsg.style.display = 'block';
-                    document.getElementById('deviceForm').reset();
-                } else {
-                    errorMsg.textContent = '❌ ' + error.message;
-                    errorMsg.style.display = 'block';
-                }
+                console.error('Error:', error);
+                errorAlert.classList.add('show');
             } finally {
-                // Reset button
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Registra Dispositivo';
+                submitBtn.innerHTML = '<span data-translate="register_button">' + 
+                    translations[currentLang]['register_button'] + '</span>';
             }
         });
-        
-        // Mostra dispositivi salvati (debug)
-        console.log('Dispositivi salvati:', JSON.parse(localStorage.getItem('burgtvDevices') || '[]'));
+
+        // Initialize
+        updateTranslations();
     </script>
 </body>
 </html>
