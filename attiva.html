@@ -250,6 +250,7 @@
     <script>
         // ===== CONFIGURAZIONE =====
         const SUPABASE_URL = 'https://ugspmqfduabfmfsoxqoc.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnc3BtcWZkdWFiZm1mc294cW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyODY0NjEsImV4cCI6MjA3MDg2MjQ2MX0.euDiQhUl4NJbuVeClfunDV8wVaWITK_UNLrdZeMYKC0';
         
         // ===== TRADUZIONI =====
         const translations = {
@@ -434,6 +435,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                     },
                     body: JSON.stringify({
                         email: email,
