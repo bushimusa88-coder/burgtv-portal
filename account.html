@@ -67,6 +67,14 @@
             <div class="info-card"><div class="info-label">Email</div><div class="info-value" id="emailDisplay">-</div></div>
             <div class="info-card"><div class="info-label">Piano</div><div class="info-value" id="planDisplay">-</div></div>
         </div>
+        <div class="section" id="subscriptionSection" style="display:none;">
+            <div class="section-title">Abbonamento</div>
+            <button class="btn btn-primary" onclick="manageSubscription()" id="manageSubBtn">
+                <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                <span>Gestisci abbonamento</span>
+            </button>
+            <p style="font-size:13px;color:var(--text-secondary);margin-top:8px;text-align:center;">Modifica metodo di pagamento o annulla</p>
+        </div>
         <div class="section">
             <div class="section-title">Sicurezza</div>
             <button class="btn btn-primary" onclick="resetPassword()">
@@ -105,9 +113,45 @@
             document.getElementById('emailDisplay').textContent=email;
             document.getElementById('userEmail').textContent=email;
             setLang(lang);
+            checkSubscription();
         });
         function resetPassword(){window.location.href='forgot-password.html'}
         function logout(){localStorage.removeItem('access_token');localStorage.removeItem('user_email');window.location.href='login.html'}
+        async function manageSubscription(){
+            const email=localStorage.getItem('user_email');
+            if(!email){alert('Email non trovata');return;}
+            const btn=document.getElementById('manageSubBtn');
+            btn.disabled=true;
+            btn.innerHTML='<span class="spinner" style="width:20px;height:20px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;"></span>';
+            try{
+                const res=await fetch(`${SUPABASE_URL}/functions/v1/create-portal-session`,{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnc3BtcWZkdWFiZm1mc294cW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ1NTMyMDEsImV4cCI6MjA2MDEyOTIwMX0.1Xj4sa51Wi8U1Ebm4B3DE5JxCR3eTx2TQUxfV0TaA-I'},
+                    body:JSON.stringify({email})
+                });
+                const data=await res.json();
+                if(data.portal_url){window.location.href=data.portal_url;}
+                else{alert(data.error||'Errore');btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span>Gestisci abbonamento</span>';}
+            }catch(e){alert('Errore di connessione');btn.disabled=false;btn.innerHTML='<svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span>Gestisci abbonamento</span>';}
+        }
+        async function checkSubscription(){
+            const email=localStorage.getItem('user_email');
+            if(!email)return;
+            try{
+                const res=await fetch(`${SUPABASE_URL}/functions/v1/verify-license`,{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnc3BtcWZkdWFiZm1mc294cW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ1NTMyMDEsImV4cCI6MjA2MDEyOTIwMX0.1Xj4sa51Wi8U1Ebm4B3DE5JxCR3eTx2TQUxfV0TaA-I'},
+                    body:JSON.stringify({email})
+                });
+                const data=await res.json();
+                if(data.valid && data.license && data.license.license_type==='subscription'){
+                    document.getElementById('subscriptionSection').style.display='block';
+                    document.getElementById('planDisplay').textContent='Abbonamento Annuale';
+                }else if(data.valid){
+                    document.getElementById('planDisplay').textContent='Licenza Permanente';
+                }
+            }catch(e){console.error(e);}
+        }
         async function deleteAccount(){
             if(!confirm(T[lang].confirm1))return;
             if(!confirm(T[lang].confirm2))return;
